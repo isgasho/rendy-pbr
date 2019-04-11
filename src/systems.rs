@@ -351,7 +351,7 @@ pub struct InstanceCacheUpdateSystem<B> {
     pub _pd: core::marker::PhantomData<B>,
 }
 
-impl<'a, B: hal::Backend + std::default::Default> System<'a> for InstanceCacheUpdateSystem<B> {
+impl<'a, B: hal::Backend> System<'a> for InstanceCacheUpdateSystem<B> {
     type SystemData = (
         Entities<'a>,
         Write<'a, InstanceCache>,

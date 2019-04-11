@@ -8,7 +8,6 @@ use rendy::{
     factory::{Config, Factory, ImageState},
     graph::{present::PresentNode, render::*, GraphBuilder},
     memory::MemoryUsageValue,
-    resource::image::TextureUsage,
 };
 
 use std::{fs::File, path::Path, time};
@@ -191,6 +190,7 @@ fn main() -> Result<(), failure::Error> {
         .build(&event_loop)?;
 
     let input = input::InputState::new(window.get_inner_size().unwrap());
+    let event_bucket = input::EventBucket(Vec::new());
 
     event_loop.poll_events(|_| ());
 
@@ -203,7 +203,6 @@ fn main() -> Result<(), failure::Error> {
         surface.kind(),
         1,
         hal::format::Format::Rgba32Float,
-        MemoryUsageValue::Data,
         Some(hal::command::ClearValue::Color([0.1, 0.3, 0.4, 1.0].into())),
     );
 
@@ -211,7 +210,6 @@ fn main() -> Result<(), failure::Error> {
         surface.kind(),
         1,
         factory.get_surface_format(&surface),
-        MemoryUsageValue::Data,
         Some(hal::command::ClearValue::Color([0.1, 0.3, 0.4, 1.0].into())),
     );
 
@@ -219,7 +217,6 @@ fn main() -> Result<(), failure::Error> {
         surface.kind(),
         1,
         hal::format::Format::D16Unorm,
-        MemoryUsageValue::Data,
         Some(hal::command::ClearValue::DepthStencil(
             hal::command::ClearDepthStencil(1.0, 0),
         )),
@@ -253,9 +250,11 @@ fn main() -> Result<(), failure::Error> {
     world.register::<components::Transform>();
     world.register::<components::Mesh>();
     world.register::<components::Camera>();
+    world.register::<components::ActiveCamera>();
     world.register::<components::Light>();
     world.register::<systems::MeshInstance>();
     world.add_resource(input);
+    world.add_resource(event_bucket);
 
     let instance_array_size = (1, 1, 1);
 
@@ -389,6 +388,7 @@ fn main() -> Result<(), failure::Error> {
     world
         .create_entity()
         .with(camera)
+        .with(components::ActiveCamera)
         .with(components::Transform(nalgebra::Similarity3::from_parts(
             nalgebra::Translation3::new(0.0, 0.0, 10.0),
             nalgebra::UnitQuaternion::identity(),

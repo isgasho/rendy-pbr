@@ -23,9 +23,11 @@ winit = "0.18"
 palette = "0.4"
 rand = "0.6"
 derivative = "1.0"
-gltf = "0.11"
 specs = "0.14"
 hibitset = "0.5"
+
+[dependencies.gltf]
+path = "../gltf"
 
 [dependencies.rendy]
 optional = true
